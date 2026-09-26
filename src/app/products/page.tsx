@@ -104,28 +104,32 @@ export default function ProductsPage() {
   };
 
   const exportCSV = () => {
-    const items = data?.data || [];
+    // Export currently filtered products or full catalog
+    const items = selectedCategory !== "ALL" ? filteredProducts : (data?.data || []);
     if (items.length === 0) return;
 
     const headers = ["Name", "SKU", "Barcode", "Category", "Total Stock", "UoM", "Description"];
     const rows = items.map((p) => [
-      `"${p.name.replace(/"/g, '""')}"`,
-      `"${p.sku}"`,
-      `"${p.barcode || ""}"`,
-      `"${p.category}"`,
-      p.totalStock,
-      `"${p.uom}"`,
+      `"${(p.name || "").replace(/"/g, '""')}"`,
+      `"${(p.sku || "").replace(/"/g, '""')}"`,
+      `"${(p.barcode || "").replace(/"/g, '""')}"`,
+      `"${(p.category || "").replace(/"/g, '""')}"`,
+      p.totalStock ?? 0,
+      `"${(p.uom || "").replace(/"/g, '""')}"`,
       `"${(p.description || "").replace(/"/g, '""')}"`,
     ]);
 
-    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
-    const encodedUri = encodeURI(csvContent);
+    const csvText = [headers.join(","), ...rows.map((r) => r.join(","))].join("\r\n");
+    // Prepend UTF-8 BOM so Excel and spreadsheet apps display special characters properly
+    const blob = new Blob(["\uFEFF" + csvText], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `stocksense_catalog_${new Date().toISOString().split("T")[0]}.csv`);
+    link.href = url;
+    link.download = `stocksense_catalog_${new Date().toISOString().split("T")[0]}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
   // Filter products by selected category
