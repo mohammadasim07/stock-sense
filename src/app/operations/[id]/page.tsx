@@ -34,7 +34,10 @@ export default function OperationDetailPage() {
         body: JSON.stringify({ action }),
       });
       const result: TransitionResult = await res.json();
-      if (!result.success) throw new Error(result.message);
+      if (!result.success) {
+        const detail = result.errors && result.errors.length > 0 ? `: ${result.errors.join("; ")}` : "";
+        throw new Error(`${result.message || "Transition failed"}${detail}`);
+      }
       return result;
     },
     onSuccess: () => {

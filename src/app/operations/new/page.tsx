@@ -37,6 +37,14 @@ export default function NewOperationPage() {
     },
   });
 
+  const { data: stockSummaryData } = useQuery<{ data: Array<{ productId: string; locationId: string; currentStock: number }> }>({
+    queryKey: ["stock-summary"],
+    queryFn: async () => {
+      const res = await fetch("/api/stock/summary");
+      return res.json();
+    },
+  });
+
   const locations = locationsData?.data || [];
   const products = productsData?.data || [];
 
@@ -353,11 +361,24 @@ export default function NewOperationPage() {
                       className="w-full rounded-xl border border-[#E5E7EB] bg-white py-2 px-3 text-sm text-[#111827] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                     >
                       <option value="">Select product...</option>
-                      {products.map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.name} ({p.sku}) — Stock: {p.totalStock} {p.uom}
-                        </option>
-                      ))}
+                      {products.map((p) => {
+                        const locStock = stockSummaryData?.data?.find(
+                          (s) => s.productId === p.id && s.locationId === formData.sourceLocationId
+                        )?.currentStock ?? 0;
+
+                        const stockLabel =
+                          formData.type === "RECEIPT"
+                            ? `Total Stock: ${p.totalStock} ${p.uom}`
+                            : formData.sourceLocationId
+                            ? `At Source: ${locStock} ${p.uom} (${p.totalStock} total in WH)`
+                            : `Stock: ${p.totalStock} ${p.uom}`;
+
+                        return (
+                          <option key={p.id} value={p.id}>
+                            {p.name} ({p.sku}) — {stockLabel}
+                          </option>
+                        );
+                      })}
                     </select>
                   </div>
 

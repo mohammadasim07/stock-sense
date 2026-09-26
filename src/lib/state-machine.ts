@@ -3,7 +3,7 @@
 // Only on "Done" are stock_moves created via ACID transaction.
 
 import prisma from "./prisma";
-import { checkAvailability } from "./ledger";
+import { checkAvailability, getStockAtLocation } from "./ledger";
 import { OperationState } from "@prisma/client";
 
 type TransitionAction = "confirm" | "check_availability" | "validate" | "cancel";
@@ -116,8 +116,22 @@ export async function transitionOperation(
         );
 
         if (!result.available) {
+          // Check other internal locations for available stock to help the user
+          const otherLocations = await prisma.location.findMany({
+            where: { type: "INTERNAL", isActive: true },
+          });
+          const locationsWithStock: string[] = [];
+          for (const loc of otherLocations) {
+            if (loc.id !== operation.sourceLocationId) {
+              const stock = await getStockAtLocation(line.productId, loc.id);
+              if (stock > 0) {
+                locationsWithStock.push(`${stock} units at ${loc.name}`);
+              }
+            }
+          }
+          const hint = locationsWithStock.length > 0 ? ` (Note: ${locationsWithStock.join(", ")})` : "";
           errors.push(
-            `Insufficient stock for "${line.product.name}": need ${qty}, have ${result.currentStock} at ${operation.sourceLocation.name}`
+            `Insufficient stock for "${line.product.name}": need ${qty}, have ${result.currentStock} at ${operation.sourceLocation.name}${hint}`
           );
         }
       }
@@ -219,22 +233,27 @@ export async function transitionOperation(
 
 /**
  * Generate the next reference number for an operation type.
- * Format: REC/001, DEL/002, INT/003
+ * Format: REC/00001, DEL/00001, INT/00001
  */
 export async function generateReference(type: "RECEIPT" | "DELIVERY" | "INTERNAL_TRANSFER"): Promise<string> {
   const prefix = type === "RECEIPT" ? "REC" : type === "DELIVERY" ? "DEL" : "INT";
 
-  const lastOp = await prisma.operation.findFirst({
+  const allOps = await prisma.operation.findMany({
     where: { type },
-    orderBy: { createdAt: "desc" },
     select: { reference: true },
   });
 
-  let nextNum = 1;
-  if (lastOp?.reference) {
-    const parts = lastOp.reference.split("/");
-    nextNum = parseInt(parts[1] || "0", 10) + 1;
+  let maxNum = 0;
+  for (const op of allOps) {
+    if (op.reference) {
+      const parts = op.reference.split("/");
+      const last = parseInt(parts[parts.length - 1], 10);
+      if (!isNaN(last) && last > maxNum) {
+        maxNum = last;
+      }
+    }
   }
 
-  return `${prefix}/${String(nextNum).padStart(3, "0")}`;
+  const nextNum = maxNum + 1;
+  return `${prefix}/${String(nextNum).padStart(5, "0")}`;
 }

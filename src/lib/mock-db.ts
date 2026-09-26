@@ -698,6 +698,14 @@ if (process.env.NODE_ENV !== "production") globalForMock.mockDb = mockDb;
 
 // Helper to assemble full operation with lines, products, and locations
 export function enrichOperation(op: DemoOperation) {
+  // Sanitize any legacy malformed reference (e.g. DEL/NaN -> DEL/00002)
+  if (!op.reference || op.reference.includes("NaN")) {
+    const prefix = op.type === "RECEIPT" ? "REC" : op.type === "DELIVERY" ? "DEL" : "INT";
+    const sameTypeOps = mockDb.operations.filter((o) => o.type === op.type);
+    const idx = sameTypeOps.indexOf(op) + 1;
+    op.reference = `${prefix}/${String(idx).padStart(5, "0")}`;
+  }
+
   const sourceLocation = mockDb.locations.find((l) => l.id === op.sourceLocationId)!;
   const destLocation = mockDb.locations.find((l) => l.id === op.destLocationId)!;
   const createdBy = mockDb.users.find((u) => u.id === op.createdById)!;
