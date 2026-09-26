@@ -45,7 +45,7 @@ export const createLocationSchema = z.object({
   image_data: z.string().optional().nullable(),
   imageData: z.string().optional().nullable(),
   photoBase64: z.string().optional().nullable(),
-  parentId: z.string().uuid().optional().nullable(),
+  parentId: z.string().min(1, "Invalid parent location").optional().nullable(),
 });
 
 export const updateLocationSchema = createLocationSchema.partial();
@@ -54,14 +54,14 @@ export const updateLocationSchema = createLocationSchema.partial();
 
 export const createOperationSchema = z.object({
   type: z.enum(["RECEIPT", "DELIVERY", "INTERNAL_TRANSFER"]),
-  sourceLocationId: z.string().uuid("Invalid source location"),
-  destLocationId: z.string().uuid("Invalid destination location"),
+  sourceLocationId: z.string().min(1, "Invalid source location"),
+  destLocationId: z.string().min(1, "Invalid destination location"),
   scheduledDate: z.string().or(z.date()),
   notes: z.string().optional().nullable(),
   lines: z
     .array(
       z.object({
-        productId: z.string().uuid("Invalid product"),
+        productId: z.string().min(1, "Invalid product"),
         quantityPlanned: z.number().int().positive("Quantity must be positive"),
       })
     )
@@ -74,8 +74,8 @@ export const updateOperationSchema = z.object({
   lines: z
     .array(
       z.object({
-        id: z.string().uuid().optional(), // existing line
-        productId: z.string().uuid("Invalid product"),
+        id: z.string().min(1).optional(), // existing line
+        productId: z.string().min(1, "Invalid product"),
         quantityPlanned: z.number().int().positive("Quantity must be positive"),
         quantityDone: z.number().int().min(0).optional(),
       })

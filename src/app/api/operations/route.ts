@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate all products exist
-    const productIds = lines.map((l) => l.productId);
+    const productIds = Array.from(new Set(lines.map((l) => l.productId)));
     const products = await prisma.product.findMany({
       where: { id: { in: productIds }, isActive: true },
     });

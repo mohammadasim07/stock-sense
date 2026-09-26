@@ -53,6 +53,13 @@ export class MockPrismaClient {
     findMany: async (args: { where?: any; skip?: number; take?: number; orderBy?: any } = {}) => {
       let list = [...mockDb.products];
       if (args.where) {
+        if (args.where.id) {
+          if (typeof args.where.id === "string") {
+            list = list.filter((p) => p.id === args.where.id);
+          } else if (args.where.id.in && Array.isArray(args.where.id.in)) {
+            list = list.filter((p) => args.where.id.in.includes(p.id));
+          }
+        }
         if (args.where.isActive !== undefined) {
           list = list.filter((p) => p.isActive === args.where.isActive);
         }
@@ -154,6 +161,13 @@ export class MockPrismaClient {
     findMany: async (args: { where?: any; include?: any; orderBy?: any } = {}) => {
       let list = [...mockDb.locations];
       if (args.where) {
+        if (args.where.id) {
+          if (typeof args.where.id === "string") {
+            list = list.filter((l) => l.id === args.where.id);
+          } else if (args.where.id.in && Array.isArray(args.where.id.in)) {
+            list = list.filter((l) => args.where.id.in.includes(l.id));
+          }
+        }
         if (args.where.type) {
           list = list.filter((l) => l.type === args.where.type);
         }
@@ -232,6 +246,13 @@ export class MockPrismaClient {
     findMany: async (args: { where?: any; skip?: number; take?: number; orderBy?: any; include?: any } = {}) => {
       let list = [...mockDb.operations];
       if (args.where) {
+        if (args.where.id) {
+          if (typeof args.where.id === "string") {
+            list = list.filter((o) => o.id === args.where.id);
+          } else if (args.where.id.in && Array.isArray(args.where.id.in)) {
+            list = list.filter((o) => args.where.id.in.includes(o.id));
+          }
+        }
         if (args.where.type) {
           list = list.filter((o) => o.type === args.where.type);
         }
