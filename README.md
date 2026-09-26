@@ -1,4 +1,4 @@
-# 📦 StockSense — Intelligent Inventory Management System
+# StockSense — Intelligent Inventory Management System
 
 <div align="center">
 
@@ -17,7 +17,7 @@
 
 ---
 
-## 📑 Table of Contents
+## Table of Contents
 
 1. [Executive Overview](#-executive-overview)
 2. [Core Architectural Pillars](#-core-architectural-pillars)
@@ -42,7 +42,7 @@
 
 ---
 
-## 🚀 Executive Overview
+## Executive Overview
 
 **StockSense** reimagines warehouse and inventory management by combining the accounting rigor of **Odoo ERP's double-entry inventory system** with a modern, high-speed React 19 + Next.js App Router user experience.
 
@@ -52,7 +52,7 @@ Additionally, StockSense features a **Smart Prisma Proxy** that probes local Pos
 
 ---
 
-## 🏛️ Core Architectural Pillars
+## Core Architectural Pillars
 
 ### 1. Immutable Double-Entry Stock Ledger
 Implemented in [`src/lib/ledger.ts`](src/lib/ledger.ts), StockSense treats every inventory movement like a financial accounting journal entry:
@@ -103,7 +103,7 @@ Implemented in [`src/components/CompressedImageUpload.tsx`](src/components/Compr
 
 ---
 
-## 🗺️ System Architecture & Diagrams
+## System Architecture & Diagrams
 
 ### High-Level System Architecture
 
@@ -279,7 +279,7 @@ flowchart LR
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology | Version | Purpose |
 | :--- | :--- | :--- | :--- |
@@ -298,7 +298,7 @@ flowchart LR
 
 ---
 
-## 📂 Project Directory Structure
+## Project Directory Structure
 
 ```text
 Odoo/
@@ -374,7 +374,7 @@ Odoo/
 
 ---
 
-## 🗄️ Database Schema & Data Model
+## Database Schema & Data Model
 
 Defined in [`prisma/schema.prisma`](prisma/schema.prisma), the data model consists of **4 Enums** and **6 Relational Models**:
 
@@ -401,7 +401,7 @@ Defined in [`prisma/schema.prisma`](prisma/schema.prisma), the data model consis
 
 ---
 
-## 🔌 Complete REST API Reference
+## Complete REST API Reference
 
 All endpoints return JSON and validate payloads using Zod schemas in [`src/lib/validators.ts`](src/lib/validators.ts).
 
@@ -452,7 +452,7 @@ All endpoints return JSON and validate payloads using Zod schemas in [`src/lib/v
 
 ---
 
-## 🖥️ Frontend Modules & User Workflows
+## Frontend Modules & User Workflows
 
 ### 1. Login & Role Persona Switcher (`/login`)
 - **Two-Step OTP Flow**: Enter email → receive 6-digit code (`123456` auto-fillable in demo) → verify & redirect to `/dashboard`.
@@ -494,7 +494,7 @@ All endpoints return JSON and validate payloads using Zod schemas in [`src/lib/v
 
 ---
 
-## 🧪 Pre-Seeded Demo Data & Personas
+## Pre-Seeded Demo Data & Personas
 
 When running in **Zero-Config Demo Mode** ([`src/lib/mock-db.ts`](src/lib/mock-db.ts)) or after seeding PostgreSQL ([`prisma/seed.ts`](prisma/seed.ts)), StockSense includes:
 
@@ -525,7 +525,7 @@ When running in **Zero-Config Demo Mode** ([`src/lib/mock-db.ts`](src/lib/mock-d
 
 ---
 
-## ⚡ Getting Started & Local Setup
+## Getting Started & Local Setup
 
 ### Prerequisites
 - **Node.js**: `v18.18+` or `v20+`
@@ -581,7 +581,7 @@ Open **[http://localhost:3000](http://localhost:3000)** in your browser.
 
 ---
 
-## 📜 Available Scripts
+## Available Scripts
 
 Run these commands from inside the `stock-sense/` directory:
 
