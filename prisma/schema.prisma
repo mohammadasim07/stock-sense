@@ -1,0 +1,161 @@
+// StockSense — Prisma Schema
+// Double-entry stock ledger with Operation state machine
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ──────────────────────────────────────────────
+// Enums
+// ──────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  MANAGER
+  OPERATOR
+}
+
+enum LocationType {
+  VENDOR
+  INTERNAL
+  CUSTOMER
+  VIRTUAL
+}
+
+enum OperationType {
+  RECEIPT
+  DELIVERY
+  INTERNAL_TRANSFER
+}
+
+enum OperationState {
+  DRAFT
+  WAITING
+  READY
+  DONE
+  CANCELLED
+}
+
+// ──────────────────────────────────────────────
+// Models
+// ──────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  email     String   @unique
+  password  String   // hashed
+  role      Role     @default(OPERATOR)
+  otp       String?  // mock OTP for auth
+  otpExpiry DateTime?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  operations Operation[]
+
+  @@map("users")
+}
+
+model Product {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String
+  sku         String   @unique
+  barcode     String?  @unique
+  category    String   @default("General")
+  uom         String   @default("Units") // unit of measure
+  description String?  @db.Text
+  image_data  String?  @db.Text
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  operationLines OperationLine[]
+  stockMoves     StockMove[]
+
+  @@map("products")
+}
+
+model Location {
+  id          String       @id @default(uuid()) @db.Uuid
+  name        String
+  type        LocationType
+  address     String?
+  image_data  String?      @db.Text
+  parentId    String?      @db.Uuid @map("parent_id")
+  isActive    Boolean      @default(true) @map("is_active")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  parent   Location?  @relation("LocationHierarchy", fields: [parentId], references: [id])
+  children Location[] @relation("LocationHierarchy")
+
+  operationsAsSource Operation[] @relation("SourceLocation")
+  operationsAsDest   Operation[] @relation("DestLocation")
+  movesFrom          StockMove[] @relation("MoveFromLocation")
+  movesTo            StockMove[] @relation("MoveToLocation")
+
+  @@map("locations")
+}
+
+model Operation {
+  id               String         @id @default(uuid()) @db.Uuid
+  reference        String         @unique // auto: REC/001, DEL/002, INT/003
+  type             OperationType
+  state            OperationState @default(DRAFT)
+  sourceLocationId String         @db.Uuid @map("source_location_id")
+  destLocationId   String         @db.Uuid @map("dest_location_id")
+  createdById      String         @db.Uuid @map("created_by_id")
+  scheduledDate    DateTime       @map("scheduled_date")
+  doneDate         DateTime?      @map("done_date")
+  notes            String?        @db.Text
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
+
+  sourceLocation Location @relation("SourceLocation", fields: [sourceLocationId], references: [id])
+  destLocation   Location @relation("DestLocation", fields: [destLocationId], references: [id])
+  createdBy      User     @relation(fields: [createdById], references: [id])
+
+  lines     OperationLine[]
+  stockMoves StockMove[]
+
+  @@map("operations")
+}
+
+model OperationLine {
+  id              String @id @default(uuid()) @db.Uuid
+  operationId     String @db.Uuid @map("operation_id")
+  productId       String @db.Uuid @map("product_id")
+  quantityPlanned Int    @map("quantity_planned")
+  quantityDone    Int    @default(0) @map("quantity_done")
+
+  operation Operation @relation(fields: [operationId], references: [id], onDelete: Cascade)
+  product   Product   @relation(fields: [productId], references: [id])
+
+  @@map("operation_lines")
+}
+
+model StockMove {
+  id             String   @id @default(uuid()) @db.Uuid
+  operationId    String   @db.Uuid @map("operation_id")
+  productId      String   @db.Uuid @map("product_id")
+  fromLocationId String   @db.Uuid @map("from_location_id")
+  toLocationId   String   @db.Uuid @map("to_location_id")
+  quantity       Int
+  movedAt        DateTime @default(now()) @map("moved_at")
+
+  operation    Operation @relation(fields: [operationId], references: [id])
+  product      Product   @relation(fields: [productId], references: [id])
+  fromLocation Location  @relation("MoveFromLocation", fields: [fromLocationId], references: [id])
+  toLocation   Location  @relation("MoveToLocation", fields: [toLocationId], references: [id])
+
+  @@index([productId, fromLocationId])
+  @@index([productId, toLocationId])
+  @@index([operationId])
+  @@index([movedAt])
+  @@map("stock_moves")
+}
