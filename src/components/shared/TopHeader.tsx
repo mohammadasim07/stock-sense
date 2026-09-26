@@ -34,29 +34,22 @@ export function TopHeader({ placeholder = "Search products, locations, or operat
         {/* Search Bar (450–550px wide, 42px height, 10px radius) */}
         <div
           onClick={() => setIsCommandOpen(true)}
-          className="relative w-full max-w-[480px] cursor-pointer group"
+          className="flex items-center gap-3 w-full max-w-[480px] h-[42px] px-3.5 bg-slate-50 hover:bg-slate-100/80 rounded-[10px] border border-slate-200 transition-colors cursor-pointer group"
         >
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-hover:text-blue-600 transition-colors">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </div>
-          <input
-            type="text"
-            readOnly
-            placeholder={placeholder}
-            className="w-full h-[42px] pl-10 pr-16 bg-slate-50 group-hover:bg-slate-100/70 text-sm text-slate-900 placeholder:text-slate-400 rounded-[10px] border border-slate-200 transition-colors cursor-pointer"
-          />
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <span className="text-[10px] font-semibold text-slate-400 bg-white border border-slate-200 rounded px-1.5 py-0.5 shadow-2xs group-hover:border-slate-300">
-              Ctrl K
-            </span>
-          </div>
+          <svg className="w-4 h-4 shrink-0 text-slate-400 group-hover:text-blue-600 transition-colors pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+          <span className="flex-1 text-sm text-slate-400 group-hover:text-slate-500 select-none truncate">
+            {placeholder}
+          </span>
+          <span className="shrink-0 text-[10px] font-semibold text-slate-400 bg-white border border-slate-200 rounded px-1.5 py-0.5 shadow-2xs group-hover:border-slate-300">
+            Ctrl K
+          </span>
         </div>
 
         {/* Right Controls: notification → 16px → profile */}
