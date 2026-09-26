@@ -357,11 +357,11 @@ class MockDatabase {
   seedDefaultData() {
     const now = new Date();
 
-    // ── 1. Users matching reference screenshots ("Nasir Ahmad / Warehouse Manager") ──
+    // ── 1. Users ("Alex Morgan / Warehouse Manager") ──
     this.users = [
       {
         id: "u-00000000-0001",
-        name: "Nasir Ahmad",
+        name: "Alex Morgan",
         email: "admin@stocksense.io",
         password: "mock_password",
         role: "ADMIN",
@@ -695,6 +695,10 @@ class MockDatabase {
 const globalForMock = globalThis as unknown as { mockDb?: MockDatabase };
 export const mockDb = globalForMock.mockDb ?? new MockDatabase();
 if (process.env.NODE_ENV !== "production") globalForMock.mockDb = mockDb;
+mockDb.users.forEach((u) => {
+  if (u.name === "Nasir Ahmad") u.name = "Alex Morgan";
+});
+mockDb.persist();
 
 // Helper to assemble full operation with lines, products, and locations
 export function enrichOperation(op: DemoOperation) {

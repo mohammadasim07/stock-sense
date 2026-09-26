@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/auth-context";
 
 const DEMO_ACCOUNTS = [
   {
-    name: "Nasir Ahmad",
+    name: "Alex Morgan",
     email: "admin@stocksense.io",
     role: "ADMIN",
     desc: "Warehouse Manager (Full System Access)",

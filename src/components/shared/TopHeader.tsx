@@ -8,7 +8,7 @@ export function TopHeader({ placeholder = "Search products, locations, or operat
   const { user } = useAuth();
   const [isCommandOpen, setIsCommandOpen] = useState(false);
 
-  const userName = (!user?.name || user?.name === "Admin User") ? "Nasir Ahmad" : user.name;
+  const userName = (!user?.name || user?.name === "Admin User") ? "Alex Morgan" : user.name;
   const userInitials = userName
     .split(" ")
     .map((n) => n[0])

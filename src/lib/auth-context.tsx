@@ -31,12 +31,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const stored = localStorage.getItem("stocksense_user");
       if (stored) {
-        setUser(JSON.parse(stored));
+        const parsed = JSON.parse(stored);
+        if (parsed?.name === "Nasir Ahmad") {
+          parsed.name = "Alex Morgan";
+          localStorage.setItem("stocksense_user", JSON.stringify(parsed));
+        }
+        setUser(parsed);
       } else {
         // Default demo session for immediate exploration
         const defaultUser: AuthUser = {
           id: "u-00000000-0001",
-          name: "Nasir Ahmad",
+          name: "Alex Morgan",
           email: "admin@stocksense.io",
           role: "ADMIN",
         };

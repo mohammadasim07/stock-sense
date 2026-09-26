@@ -55,8 +55,8 @@ export function Sidebar() {
     return null;
   }
 
-  const displayName = (!user?.name || user?.name === "Admin User") ? "Nasir Ahmad" : user.name;
-  const displayRole = displayName === "Nasir Ahmad" ? "Warehouse Manager" : user?.role === "ADMIN" ? "Administrator" : user?.role === "OPERATOR" ? "Warehouse Operator" : "Warehouse Manager";
+  const displayName = (!user?.name || user?.name === "Admin User") ? "Alex Morgan" : user.name;
+  const displayRole = displayName === "Alex Morgan" ? "Warehouse Manager" : user?.role === "ADMIN" ? "Administrator" : user?.role === "OPERATOR" ? "Warehouse Operator" : "Warehouse Manager";
   const initials = displayName
     .split(" ")
     .map((n) => n[0])
@@ -120,7 +120,7 @@ export function Sidebar() {
               Switch Demo Account
             </p>
             {[
-              { name: "Nasir Ahmad", email: "admin@stocksense.io", role: "Warehouse Manager" },
+              { name: "Alex Morgan", email: "admin@stocksense.io", role: "Warehouse Manager" },
               { name: "Sarah Manager", email: "manager@stocksense.io", role: "Operations Lead" },
               { name: "John Operator", email: "operator@stocksense.io", role: "Stock Handler" },
             ].map((acc) => (
